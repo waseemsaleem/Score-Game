@@ -1,0 +1,321 @@
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+        canvas {
+            border: 1px solid #d3d3d3;
+            background-color: #f1f1f1;
+            margin-left: 20px;
+        }
+        h2{
+            display: inline;
+        }
+        #time{
+            width: 400px;
+            margin: 5px 40px;
+            display: inline-block;
+        }
+        #ans{
+margin: 5px 300px;
+ 
+        }
+    </style>
+</head>
+
+<body onload="startGame()">
+    <script>
+        var noOfPictures = 10;
+        var pictures = ["./images/japan/hiroshima.jpg", "./images/Korea/busan.jpg", "./images/thai/bangkok.jpg", "./images/Korea/seoul.jpg", "./images/china/hangzhou.jpg",
+            "./images/japan/tokyo.jpg", "./images/china/shangai.jpg", "./images/Korea/ulsan.jpg", "./images/china/xian.jpg",
+            "./images/thai/chiang.jpg"
+        ];
+        var answers = ["Japanese", "Korean", "Thai", "Korean", "Chinese", "Japanese", "Chinese", "Korean", "Chinese", "Thai"];
+        var bb = document.body.getBoundingClientRect();
+        var leftMargin = 20;
+        var myGamePiece, japanese, chinese, korean, thai;
+        var noOfcalls = 0, second = 0, score = 0;
+        var isCountrySelected = false, selectedCountryName;
+        var decSecond = 0, decNoOfCalls = 0;
+        var index = 0, turn = "play";
+        var boxWidth = 300;
+        var boxHeight = 200;
+        var picboxWidth = 300;
+        var picboxHeight = 200;
+        var but = false;
+        function startGame() {
+            document.getElementById("time").innerHTML = "<button id=\"StartGame\" onclick=\"play()\" >Play</button>";
+            japanese = new component(20, 20, "Japanese", boxWidth, boxHeight, "countryBox");
+            chinese = new component(980, 20, "Chinese", boxWidth, boxHeight, "countryBox");
+            korean = new component(20, 380, "Korean", boxWidth, boxHeight, "countryBox");
+            thai = new component(980, 380, "Thai", boxWidth, boxHeight, "countryBox");
+            myGameArea.start();
+        }
+        function play() {
+            if (turn == "play") {
+                myGamePiece = new component(500, 10, pictures[index], picboxWidth,picboxHeight, "image");
+            }
+            else if (turn == "end") {
+
+                myGamePiece.y = 0;
+            }
+            index = 0;
+            score = 0;
+            turn = "game";
+            decNoOfCalls = 0;
+            isCountrySelected = false;
+            selectedCountryName = "";
+            second = 0;
+            noOfcalls = 0;
+            myGamePiece.y = 0;
+            myGamePiece.x = 500;
+            myGamePiece.value = pictures[index];
+        }
+        var myGameArea = {
+            canvas: document.createElement("canvas"),
+            start: function () {
+                this.canvas.width = 1300;
+                this.canvas.height = 600;
+                this.context = this.canvas.getContext("2d");
+                document.body.insertBefore(this.canvas, document.body.childNodes[0]);
+                this.interval = setInterval(updateGameArea, 20);
+                var lenths = this.canvas.getBoundingClientRect();
+                this.canvas.addEventListener('mousemove', function (e) {
+                    myGameArea.canvas.mouseX = e.pageX - 8;
+                    myGameArea.canvas.mouseY = e.pageY - 8;
+                })
+                window.addEventListener('mousedown', function (e) {
+                    myGameArea.canvas.clickX = e.pageX - 8;
+                    myGameArea.canvas.clickY = e.pageY - 8;
+                })
+                window.addEventListener('mouseup', function (e) {
+                    myGameArea.canvas.clickX = false;
+                    myGameArea.canvas.clickY = false;
+                })
+                window.addEventListener('touchstart', function (e) {
+                    myGameArea.canvas.clickX = e.pageX - 8;
+                    myGameArea.canvas.clickY = e.pageY - 8;
+                })
+                window.addEventListener('touchend', function (e) {
+                    myGameArea.canvas.clickX = false;
+                    myGameArea.canvas.clickY = false;
+                })
+            },
+            clear: function () {
+                this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            },
+        }
+
+        function component(x, y, value, width, height, componentType) {
+            this.width = width;
+            this.height = height;
+            this.x = x;
+            this.y = y;
+            this.type = componentType;
+            this.value = value;
+            this.update = function () {
+                ctx = myGameArea.context;
+                if (this.type == "image") {
+                    this.image = new Image();
+                    this.image.src = this.value;
+                    ctx.drawImage(this.image,
+                        this.x,
+                        this.y,
+                        this.width, this.height);
+                } else if (this.type == "countryBox") {
+                    ctx.fillStyle = "lightgreen";
+                    ctx.fillRect(this.x, this.y, this.width, this.height);
+                    ctx.font = "20px Arial";
+                    ctx.fillStyle = "black";
+                    ctx.fillText(this.value, this.x + 100, this.y + 100);
+                }
+            }
+            this.decide = function () {
+                if (myGameArea.canvas.clickX - 20 >= this.x && myGameArea.canvas.clickX <= this.x + this.width &&
+                    myGameArea.canvas.clickY > this.y && myGameArea.canvas.clickY < this.y + this.height) {
+
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+            this.newPos = function () {
+                if (myGameArea.canvas.mouseX - 20 >= this.x && myGameArea.canvas.mouseX <= this.x + this.width &&
+                    myGameArea.canvas.mouseY > this.y && myGameArea.canvas.mouseY < this.y + this.height) {
+                    this.width = 320;
+                    this.height = 210;
+
+                } else {
+                    this.width = 300;
+                    this.height = 200;
+                }
+            }
+            this.setDimention = function () {
+                this.width = 300;
+                this.height = 200;
+            }
+
+            function addImageToCountryBox() {
+
+                ctx = myGameArea.context();
+                image1 = new Image();
+                image1.src = "D:\\games\\IMG_20171230_211438.jpg";
+                ctx.drawImage(this.image1,
+                    this.x,
+                    this.y,
+                    this.width, this.height);
+            }
+        }
+        function anyCountrySelected() {
+            if (japanese.decide()) { selectedCountryName = "Japanese"; isCountrySelected = true; return; }
+            else if (korean.decide()) { selectedCountryName = "Korean"; isCountrySelected = true; return; }
+            else if (thai.decide()) { selectedCountryName = "Thai"; isCountrySelected = true; return; }
+            else if (chinese.decide()) { selectedCountryName = "Chinese"; isCountrySelected = true; return; }
+
+        }
+        function anyCountryHover() {
+            japanese.newPos();
+            korean.newPos();
+            thai.newPos();
+            chinese.newPos();
+        }
+        function updateCalls(name) {
+            var nx,ny,rx,ry;
+            if (name == "Japanese") {
+                // nx=myGamePiece.x/20;
+                // ny=myGamePiece.y/20;
+                // while(nx!=0 && ny!==0){
+                //     myGamePiece.x=myGamePiece.x-nx;
+                //     myGamePiece.y=myGamePiece.y-ny;
+                //     nx=myGamePiece.x/20;
+                //     ny=myGamePiece.y/20;
+                // }   
+                // // nx=myGamePiece.x%20;
+                // // ny=myGamePiece.y%20;
+
+                myGamePiece.x = japanese.x;
+                myGamePiece.y = japanese.y;
+                japanese.setDimention();
+            }
+            else if (name == "Korean") {
+                myGamePiece.x = korean.x;
+                myGamePiece.y = korean.y;
+                korean.setDimention();
+            }
+            else if (name == "Thai") {
+                myGamePiece.x = thai.x;
+                myGamePiece.y = thai.y;
+                thai.setDimention();
+            }
+            else if (name == "Chinese") {
+                myGamePiece.x = chinese.x;
+                myGamePiece.y = chinese.y;
+                chinese.setDimention();
+            }
+        }
+       
+        function updateGameArea() {
+            myGameArea.clear();
+            if (myGameArea.canvas.mouseX && myGameArea.canvas.mouseY && !isCountrySelected && turn == "game") {
+                anyCountryHover();
+            }
+            if (myGameArea.canvas.clickX && myGameArea.canvas.clickY && !isCountrySelected && turn == "game") {
+
+                anyCountrySelected();
+                if (isCountrySelected) {
+                    //updateCalls(selectedCountryName);
+                }
+
+            }
+
+            if (turn == "game") {
+                document.getElementById("time").innerHTML = "Time remaining " + "0:0" + (3 - second) + " seconds";
+                noOfcalls++;
+                myGamePiece.y += (myGameArea.canvas.height) / (3 * 1000 / 20);
+                if (noOfcalls == 1000 / 20 && second != 3) {
+                    second++;
+                    noOfcalls = 0;
+                }
+                if (second == 3 || isCountrySelected) {
+                    turn = "decision";
+                    decNoOfCalls = 0;
+                    decSecond = 0;
+                }
+            }
+
+            if (turn == "decision") {
+
+                decNoOfCalls++;
+                if (decNoOfCalls == 1000 / 20 && decSecond != 3) {
+                    decNoOfCalls = 0;
+                    decSecond++;
+                }
+                if (decSecond == 3) {
+                    document.getElementById("ans").innerHTML = "";
+                    turn = "game";
+                    isCountrySelected = false;
+                    selectedCountryName = "";
+                    index++;
+                    second = 0;
+                    noOfcalls = 0;
+                    myGamePiece.y = 0;
+                    myGamePiece.x = 500;
+                    myGamePiece.value = pictures[index];
+                }
+                if (decSecond == 1 && decNoOfCalls == 0) {
+                    if (!isCountrySelected) {
+                        document.getElementById("ans").innerHTML = "Not Selected";
+                        score = score - 5;
+                    }
+                    else if (selectedCountryName == answers[index]) {
+                        document.getElementById("ans").innerHTML = "Correct";
+                        score = score + 20;
+                    }
+                    else {
+                        document.getElementById("ans").innerHTML = "Wrong";
+                        score = score - 5;
+                    }
+                    updateCalls(answers[index]);
+                }
+                if (index == noOfPictures) {
+                    document.getElementById("ans").innerHTML = "";
+                    turn = "end";
+                    isCountrySelected = true;
+                    but = false;
+
+                }
+                document.getElementById("time").innerHTML = "Next picture is coming in " + "0:0" + (3 - decSecond) + " seconds";
+            }
+            if (turn == "end") {
+                if (!but) {
+                    document.getElementById("time").innerHTML = "<button id=\"StartGame1\" onclick=\"play()\" >Play Again</button>";
+                    but = true;
+                }
+                document.getElementById("sc").innerHTML = "Your Score is " + score;
+            }
+            else {
+                document.getElementById("sc").innerHTML = "Score = " + score;
+            }
+
+            japanese.update();
+            korean.update();
+            thai.update();
+            chinese.update();
+            if (turn != "end" && turn != "play") {
+                myGamePiece.update();
+            }
+
+
+        }
+    </script>
+
+    </div>
+    <h2 id="time" style="color: red"></h2>
+    <div style="float:right;">
+   
+    <h2 id="ans" style="text-align: center"></h2>
+    <h2 id="sc" style="text-align: center"></h2>
+</div>
+</body>
+
+</html>
